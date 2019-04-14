@@ -4,9 +4,11 @@ require 'active_support'
 require 'io/console'
 
 require_relative 'helpers'
+require_relative 'ascii_art'
+
+a = Artii::Base.new :font => 'ogre'
 
 clear
-
 puts 'Introduce el tiempo en minutos'
 minutes = gets.chomp.to_i
 
@@ -14,41 +16,44 @@ clear
 
 puts 'Introduce la clave de desactivación'
 bomb_key = gets.chomp
-
+accumulated_key = []
 bomb_deactivated = false
 
 final = Time.now + minutes * 60
 
 loop do
-  accumulated_key = []
-  pressed_key = nil  
+  
+  pressed_key = nil   
   begin
     clear
-    puts "SE ESTÁ ACABANDO EL TIEMPO..."
-    puts "#{format_time(time_remaining(final))}"
-
-    puts "Introduce la clave:\n\n"
-
-    print "#{accumulated_key.join}"
+    print_with_space a.asciify("SE ESTA ACABANDO EL TIEMPO...")
+    print_with_space a.asciify("#{format_time(time_remaining(final))}")
+    print_with_space a.asciify("Introduce   la     clave   :\n\n")
+    print_with_space a.asciify("#{accumulated_key.join}#{'*' * (bomb_key.length - accumulated_key.length)}")
+    break if Time.now > final
 
     Timeout.timeout(1) do
       pressed_key = STDIN.getch
       raise Timeout::Error
-    end
+    end 
 
-    break if Time.now > final
-
-  rescue Timeout::Error
-    if pressed_key
+    rescue Timeout::Error
+      if pressed_key
         accumulated_key << pressed_key
         pressed_key = nil
-    end
-
-    if accumulated_key.join == bomb_key
+      end
+      
+      if accumulated_key.join == bomb_key
         bomb_deactivated = true
         break
-    end
-    
+      end
+      
+      if accumulated_key.length == bomb_key.length && accumulated_key != bomb_key
+        final = final-30
+        accumulated_key.clear
+        pressed_key = nil
+      end
+      
     retry
   end
 end
@@ -56,13 +61,13 @@ end
 clear
 
 if bomb_deactivated
-  puts "Bomba desactivada! Ha sobrado #{format_time(time_remaining(final))}"
+  puts a.asciify("Bomba desactivada!")
+  puts a.asciify("Ha sobrado: #{format_time(time_remaining(final))}")
+  print_wolf
 else
-  puts "BOOM!"
+  puts a.asciify("BOOM  !!!!     ")
+  print_bomb
 end
-
 loop do
   sleep 60
 end
-
-3.times { puts }
