@@ -4,12 +4,10 @@ require 'active_support'
 require 'io/console'
 
 require_relative 'helpers'
-
+require_relative 'ascii_art'
 
 a = Artii::Base.new :font => 'ogre'
-b = Artii::Base.new :font => 'catwalk'
-c = Artii::Base.new :font => 'cosmic'
-d = Artii::Base.new :font => 'invita'
+
 clear
 puts 'Introduce el tiempo en minutos'
 minutes = gets.chomp.to_i
@@ -19,25 +17,23 @@ clear
 puts 'Introduce la clave de desactivación'
 bomb_key = gets.chomp
 accumulated_key = []
-(bomb_key.length).times { accumulated_key << "*" }
 bomb_deactivated = false
 
 final = Time.now + minutes * 60
 
 loop do
   
-  pressed_key = nil  
-  count = 0
+  pressed_key = nil   
   begin
     clear
-    3.times { puts }
+    insert_space
     puts a.asciify("SE ESTA ACABANDO EL TIEMPO...")
-    3.times { puts }
-    puts d.asciify("#{format_time(time_remaining(final))}")
-    3.times { puts }
-    puts c.asciify("Introduce   la     clave   :\n\n")
-    3.times { puts }
-    print b.asciify("#{accumulated_key.join}")
+    insert_space
+    puts a.asciify("#{format_time(time_remaining(final))}")
+    insert_space
+    puts a.asciify("Introduce   la     clave   :\n\n")
+    insert_space
+    print a.asciify("#{accumulated_key.join}#{'*' * (bomb_key.length - accumulated_key.length)}")
     break if Time.now > final
 
     Timeout.timeout(1) do
@@ -47,8 +43,7 @@ loop do
 
     rescue Timeout::Error
       if pressed_key
-        accumulated_key[count] = pressed_key
-        count = count.next
+        accumulated_key << pressed_key
         pressed_key = nil
       end
       
@@ -57,11 +52,9 @@ loop do
         break
       end
       
-      if accumulated_key[bomb_key.length-1] != "*" && accumulated_key.join != bomb_key
+      if accumulated_key.length == bomb_key.length && accumulated_key != bomb_key
         final = final-30
         accumulated_key.clear
-        (bomb_key.length).times { accumulated_key << "*" }
-        count = 0
         pressed_key = nil
       end
       
@@ -72,48 +65,13 @@ end
 clear
 
 if bomb_deactivated
-  puts a.asciify("Bomba desactivada! Ha sobrado #{format_time(time_remaining(final))}")
-  puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@'~~~     ~~~`@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@@@@@@@@'                     `@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@@@@@'                           `@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@@@'                               `@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@'                                   `@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@'                                     `@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@'                                       `@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@                                         @@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@'                                         `@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@                                           @@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@                                           @@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@                       n,                  @@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@                     _/ | _                @@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@                    /'  `'/                @@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@a                 <~    .'                a@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@                 .'    |                 @@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@a              _/      |                a@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@a           _/      `.`.              a@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@a     ____/ '   \__ | |______       a@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@@@a__/___/      /__\ \ \     \___.a@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@@@/  (___.'\_______)\_|_|        \@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@@@@@@@@@@@|\________                       ~~~~~\@@@@@@@@@@@@@@@@@@
-  ~~~\@@@@@@@@@@@@@@||       |\___________________________/|@/~~~~~~~~~~~\@@@
-      |~~~~\@@@@@@@/ |  |    | | by: S.C.E.S.W.          | ||\____________|@@ "
+  puts a.asciify("Bomba desactivada!")
+  puts a.asciify("Ha sobrado: #{format_time(time_remaining(final))}")
+  print_wolf
 else
-  puts c.asciify("BOOM  !!!!     ")
-  print "     _.-^^---....,,--
-  _--                  --_
-  <                        >)
-  |                         |
-  \._                   _./
-     ```--. . , ; .--'''
-           | |   |
-        .-=||  | |=-.
-        `-=#$%&%$#=-'
-           | ;  :|
-  _____.,-#%&$@%#&#~,._____"
+  puts a.asciify("BOOM  !!!!     ")
+  print_bomb
 end
-
 loop do
   sleep 60
 end
-

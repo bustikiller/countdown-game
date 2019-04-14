@@ -17,3 +17,7 @@ end
 def clear
     system "clear" or system "cls"
 end
+
+def insert_space
+  3.times { puts }
+end
