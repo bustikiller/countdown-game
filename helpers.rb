@@ -18,6 +18,11 @@ def clear
     system "clear" or system "cls"
 end
 
+def print_with_space(text)
+  insert_space
+  puts text
+end
+
 def insert_space
   3.times { puts }
 end

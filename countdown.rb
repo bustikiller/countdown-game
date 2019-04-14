@@ -26,14 +26,10 @@ loop do
   pressed_key = nil   
   begin
     clear
-    insert_space
-    puts a.asciify("SE ESTA ACABANDO EL TIEMPO...")
-    insert_space
-    puts a.asciify("#{format_time(time_remaining(final))}")
-    insert_space
-    puts a.asciify("Introduce   la     clave   :\n\n")
-    insert_space
-    print a.asciify("#{accumulated_key.join}#{'*' * (bomb_key.length - accumulated_key.length)}")
+    print_with_space a.asciify("SE ESTA ACABANDO EL TIEMPO...")
+    print_with_space a.asciify("#{format_time(time_remaining(final))}")
+    print_with_space a.asciify("Introduce   la     clave   :\n\n")
+    print_with_space a.asciify("#{accumulated_key.join}#{'*' * (bomb_key.length - accumulated_key.length)}")
     break if Time.now > final
 
     Timeout.timeout(1) do
